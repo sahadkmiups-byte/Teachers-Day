@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIUPS Kuttiady - Teachers Day Poster</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Noto Sans Malayalam', sans-serif;background:#eef3f8}
+.container{max-width:450px;margin:0 auto;background:#fff;padding:15px;box-shadow:0 0 10px #0002}
+h2{color:#1a4a6e;text-align:center}
+input,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;font-size:16px}
+button{background:#1a4a6e;color:#fff;font-weight:bold;border:none}
+#previewImg{width:100%;margin-top:15px;border:1px solid #ddd;display:none}
+#image{max-width:100%;display:none}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>അധ്യാപക ദിന പോസ്റ്റർ</h2>
+<input type="file" id="upload" accept="image/*">
+<div><img id="image"></div>
+<input type="text" id="nameInput" placeholder="Name : ഉദാ: Arun Kumar">
+<input type="text" id="schoolInput" placeholder="Fav School : ഉദാ: MIUPS Kuttiady">
+<button id="createBtn">പോസ്റ്റർ ഉണ്ടാക്കുക</button>
+<canvas id="canvas" style="display:none"></canvas>
+<img id="previewImg">
+<a id="downloadBtn" style="display:none"><button>Download</button></a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script>
+let cropper;
+const imageEl = document.getElementById('image');
+document.getElementById('upload').addEventListener('change', e=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  imageEl.src=URL.createObjectURL(file);
+  imageEl.style.display='block';
+  if(cropper) cropper.destroy();
+  cropper=new Cropper(imageEl,{aspectRatio:280/350,viewMode:1});
+});
+
+document.getElementById('createBtn').onclick=()=>{
+  const name=document.getElementById('nameInput').value || ' ';
+  const school=document.getElementById('schoolInput').value || ' ';
+  if(!cropper){alert('ഫോട്ടോ അപ്‌ലോഡ് ചെയ്യൂ');return;}
+
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=1080; canvas.height=1350;
+
+  const bg=new Image();
+  bg.src='background.jpg'; // നിങ്ങൾ അപ്‌ലോഡ് ചെയ്ത പോസ്റ്റർ
+  bg.onload=()=>{
+    ctx.drawImage(bg,0,0,1080,1350);
+
+    // നിങ്ങളുടെ ഫോട്ടോ വരുന്ന സ്ഥാനം - ഈ ഡിസൈനിൽ ഇടത്ത് താഴെ
+    const cropped= cropper.getCroppedCanvas({width:600,height:750});
+    // x, y, width, height - ഈ കണക്കുകൾ നിങ്ങളുടെ ഡിസൈനിന് കറക്റ്റ് ആക്കിയതാണ്
+    ctx.drawImage(cropped, 34, 770, 280, 350);
+
+    // Name എഴുതുന്ന ഭാഗം
+    ctx.fillStyle="#000";
+    ctx.font="bold 32px sans-serif";
+    ctx.fillText(name, 340, 830);
+
+    // Fav School എഴുതുന്ന ഭാഗം
+    ctx.font="24px sans-serif";
+    ctx.fillText(school, 340, 895);
+
+    const preview=document.getElementById('previewImg');
+    preview.src=canvas.toDataURL('image/jpeg',0.9);
+    preview.style.display='block';
+    const dl=document.getElementById('downloadBtn');
+    dl.href=preview.src;
+    dl.download='Teachers-Day-MIUPS.jpg';
+    dl.style.display='block';
+    window.scrollTo(0,document.body.scrollHeight);
+  };
+};
+</script>
+</body>
+</html>
